@@ -1,4 +1,5 @@
 # consulta_cep.py
+import json
 import requests
 
 historico = [] 
@@ -26,7 +27,8 @@ while True:
     print("\n=== Consulta de CEP ===")
     print("1 - Buscar um CEP") 
     print("2 - Ver histórico de buscas") 
-    print("3 - Sair")
+    print("3 - Salvar histórico em arquivo")
+    print("4 - Sair")
     
     opcao = input("Escolha uma opção: ").strip()
     
@@ -40,7 +42,6 @@ while True:
             
         dados = consultar_cep(cep)
         
-        
         if dados.get("erro"):
             print("CEP não encontrado.")
             continue
@@ -51,11 +52,19 @@ while True:
     elif opcao == "2": 
         if not historico: 
             print("Nenhuma busca feita ainda.") 
-        for item in historico: 
-            print(item["cep"], "-", item["logradouro"]) 
+        else:
+            for item in historico: 
+                rua = item.get("logradouro") or "Sem logradouro"
+                print(item.get("cep", "N/A"), "-", rua) 
+                
     elif opcao == "3": 
-        print("Até logo!") 
-        break 
+        with open("historico.json", "w", encoding="utf-8") as arquivo:
+            json.dump(historico, arquivo, indent=2, ensure_ascii=False)
+        print("Histórico salvo em historico.json!") 
+        
+    elif opcao == "4":
+        print("Até logo!")
+        break
         
     else:
         print("Opção inválida.")
